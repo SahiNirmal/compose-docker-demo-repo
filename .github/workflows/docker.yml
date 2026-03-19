@@ -10,15 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout
+      # 1. Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. ✅ ADD DEBUG STEP HERE
+      # 2. Debug secrets (to verify they are available)
       - name: Debug secrets
         run: |
-          echo "Username length: ${#DOCKER_USERNAME}"
-          echo "Password length: ${#DOCKER_PASSWORD}"
+          echo "==== DEBUG START ===="
+          if [ -z "$DOCKER_USERNAME" ]; then echo "USERNAME is EMPTY"; else echo "USERNAME is SET"; fi
+          if [ -z "$DOCKER_PASSWORD" ]; then echo "PASSWORD is EMPTY"; else echo "PASSWORD is SET"; fi
+          echo "==== DEBUG END ===="
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -30,10 +32,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 4. Build image
+      # 4. Build Docker image
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:latest .
 
-      # 5. Push image
+      # 5. Push Docker image
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/my-app:latest
