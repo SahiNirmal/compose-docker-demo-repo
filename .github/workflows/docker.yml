@@ -10,19 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2. ✅ ADD DEBUG STEP HERE
+      - name: Debug secrets
+        run: |
+          echo "Username length: ${#DOCKER_USERNAME}"
+          echo "Password length: ${#DOCKER_PASSWORD}"
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 3. Login to Docker Hub
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # 4. Build image
       - name: Build Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:latest .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:latest .
 
+      # 5. Push image
       - name: Push Docker image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/my-app:latest
